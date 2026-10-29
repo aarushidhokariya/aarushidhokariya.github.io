@@ -1,0 +1,325 @@
+/* =========================================================
+   home.css: the portfolio homepage (index.html).
+   Style reference: a dark, grainy, out-of-focus-light look with a roaming
+   glass lens, light-weight giant type and one italic serif accent per screen.
+   ========================================================= */
+
+/* ---------- 1. Design tokens ---------- */
+:root {
+  --black: #050608;
+  --text: #f4f4f2;
+  --muted: rgba(244, 244, 242, 0.6);
+  --line: rgba(244, 244, 242, 0.16);
+  --amber: #ffa800;        /* accent on the first screen */
+  --teal: #00ffe0;         /* accent on the second screen */
+  --card: #070707;
+
+  --sans: "Manrope", system-ui, sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
+
+  --gutter: clamp(18px, 5.5vw, 84px);
+}
+
+/* ---------- 2. Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; }
+
+/* Small uppercase text used for the nav and the corner notes */
+.caps { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.45; }
+
+/* The italic serif accent word */
+.accent { font-family: var(--serif); font-style: italic; font-weight: 400; letter-spacing: 0; }
+.amber { color: var(--amber); }
+.teal { color: var(--teal); }
+
+/* ---------- 3. Background: soft light + film grain ----------
+   Two fixed layers sit behind everything. script.js fades from the cool
+   blue one to the colourful one as you scroll (it sets --mix from 0 to 1). */
+.bg { position: fixed; inset: 0; z-index: -2; overflow: hidden; }
+.bg div { position: absolute; inset: -20%; transition: opacity 0.2s linear; }
+.bg-cool {
+  background:
+    radial-gradient(38% 42% at 62% 22%, rgba(52, 96, 170, 0.75), transparent 70%),
+    radial-gradient(30% 36% at 18% 70%, rgba(32, 70, 140, 0.55), transparent 70%),
+    radial-gradient(34% 40% at 88% 78%, rgba(40, 80, 150, 0.45), transparent 70%);
+  animation: drift 20s ease-in-out infinite alternate;
+}
+.bg-warm {
+  opacity: var(--mix, 0);
+  background:
+    radial-gradient(30% 34% at 70% 18%, rgba(0, 190, 160, 0.75), transparent 70%),
+    radial-gradient(34% 40% at 22% 40%, rgba(120, 10, 90, 0.85), transparent 70%),
+    radial-gradient(26% 30% at 12% 82%, rgba(230, 170, 20, 0.7), transparent 70%),
+    radial-gradient(34% 30% at 62% 96%, rgba(220, 50, 30, 0.75), transparent 70%),
+    radial-gradient(26% 26% at 46% 70%, rgba(80, 60, 200, 0.55), transparent 70%);
+  animation: drift 26s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift { to { transform: translate(-4%, 3%) rotate(4deg) scale(1.06); } }
+
+/* Film grain: an SVG noise pattern laid over the whole page */
+.grain {
+  position: fixed; inset: 0; z-index: 50; pointer-events: none;
+  opacity: 0.16; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- 4. Navigation: spread across the full width ---------- */
+.nav {
+  position: fixed; inset: 0 0 auto 0; z-index: 40;
+  display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; align-items: center;
+  padding: 28px var(--gutter);
+}
+.nav a { opacity: 0.9; transition: opacity 0.2s; }
+.nav a:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 640px) {
+  .nav { grid-template-columns: 1fr auto auto; gap: 18px; padding-top: 20px; }
+  .nav .hide-sm { display: none; }
+}
+
+/* ---------- 5. Hero ---------- */
+.hero { position: relative; height: 100svh; min-height: 560px; padding: 0 var(--gutter); }
+.hero-inner {
+  position: absolute; left: var(--gutter); right: var(--gutter); top: 50%;
+  transform: translateY(-55%);
+  will-change: transform, filter, opacity;
+}
+
+/* "Content" left, "video-first" right, "marketer" right */
+.hero-title {
+  display: grid; width: fit-content; margin: 0;
+  font-weight: 400;
+  font-size: clamp(3.4rem, 13.5vw, 13.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+  user-select: none;
+}
+.hero-title .l1 { justify-self: start; }
+.hero-title .acc { justify-self: end; font-size: 0.5em; line-height: 1; margin: -0.1em 0 -0.38em; }
+.hero-title .l2 { justify-self: end; padding-left: 1.3em; }   /* pushed right, so the two lines stagger */
+
+/* One-line intro under the name, lined up with the second line */
+.hero-intro {
+  margin: 0.7em 0 0 calc(1.3 * clamp(3.4rem, 13.5vw, 13.5rem) / 1);
+  font-size: clamp(1.3rem, 2.6vw, 2.4rem); font-weight: 300; letter-spacing: -0.02em;
+  opacity: 0; animation: fade-in 1s ease 1.2s forwards;
+}
+.hero-intro .accent { font-size: 1.12em; }
+@media (max-width: 640px) { .hero-intro { margin-left: 0; } }
+
+/* Bottom corners: two small info columns and the scroll marker */
+.hero-meta { position: absolute; left: var(--gutter); bottom: 44px; display: flex; gap: clamp(28px, 8vw, 120px); }
+.hero-meta p { margin: 0; }
+.hero-meta .dim { opacity: 0.55; font-weight: 500; margin-bottom: 6px; }
+/* Small glowing dot = "currently doing this" */
+.live {
+  display: inline-block; width: 7px; height: 7px; margin-right: 8px; border-radius: 50%;
+  background: var(--teal); box-shadow: 0 0 0 0 rgba(0, 255, 224, 0.6);
+  animation: pulse 2s ease-out infinite;
+}
+@keyframes pulse { to { box-shadow: 0 0 0 8px rgba(0, 255, 224, 0); } }
+
+.scroll-mark {
+  position: absolute; right: var(--gutter); bottom: 40px;
+  width: 1px; height: 64px; background: var(--text); opacity: 0.8;
+}
+.scroll-mark::after {   /* arrow head */
+  content: ""; position: absolute; left: -3px; bottom: 0;
+  width: 7px; height: 7px; border-right: 1px solid var(--text); border-bottom: 1px solid var(--text);
+  transform: rotate(45deg);
+}
+
+/* ---------- 6. The glass lens ----------
+   A circle that drifts across the headline by itself (or follows the mouse).
+   Inside it, a copy of the headline is enlarged, slightly out of focus and
+   split into colours, like looking through a real glass ball. */
+.lens {
+  position: absolute; left: 0; top: 0; z-index: 2;
+  width: clamp(110px, 15vw, 210px); aspect-ratio: 1; border-radius: 50%;
+  overflow: hidden; pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.05) 60%);
+  box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.12), 0 12px 30px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  filter: opacity(var(--lens-fade, 1));   /* script.js fades it out as you scroll */
+}
+.lens .hero-title {
+  position: absolute; left: 0; top: 0; margin: 0;
+  filter: blur(1.6px);
+  text-shadow: -5px 0 rgba(255, 40, 60, 0.9), 5px 0 rgba(0, 200, 255, 0.9), 0 3px rgba(255, 220, 0, 0.6);
+}
+
+/* ---------- 7. Second screen: statement + card deck ---------- */
+.intro {
+  position: relative; min-height: 100svh;
+  display: grid; grid-template-columns: 1fr; gap: 56px; align-items: center;
+  padding: 120px var(--gutter) 80px;
+  overflow-x: clip;   /* the cards stacked behind can't push the page sideways */
+}
+@media (min-width: 980px) { .intro { grid-template-columns: 0.85fr 1.15fr; } }
+
+.statement { font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 400; line-height: 0.95; letter-spacing: -0.045em; margin: 0; }
+.statement span { display: block; }
+.statement .accent { display: inline; font-size: 1.08em; }
+.intro .caps { margin-top: 36px; opacity: 0.75; }
+
+/* The deck: cards stacked on top of each other. script.js sets each
+   card's position in the stack with data-pos (0 = front, 1, 2 = behind). */
+.deck { position: relative; height: clamp(420px, 46vw, 560px); }
+.deck-card {
+  position: absolute; inset: 0 auto auto 0; width: min(100%, 680px); height: calc(100% - 60px);
+  display: flex; flex-direction: column;
+  background: var(--card); border-radius: 18px;
+  padding: clamp(20px, 3vw, 34px);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  transition: transform 0.8s cubic-bezier(0.2, 0.75, 0.15, 1), filter 0.8s, opacity 0.8s;
+  opacity: 0; pointer-events: none;
+}
+.deck-card[data-pos="0"] { opacity: 1; pointer-events: auto; transform: translate(0, 0); z-index: 3; }
+/* Cards behind sit higher and to the right, so their titles peek out, slightly out of focus */
+.deck-card[data-pos="1"] { opacity: 1; transform: translate(7%, -15%) scale(0.94); filter: blur(1.5px) brightness(0.75); z-index: 2; }
+.deck-card[data-pos="2"] { opacity: 1; transform: translate(13%, -29%) scale(0.88); filter: blur(3px) brightness(0.55); z-index: 1; }
+.deck { margin-top: 90px; }   /* room for the cards peeking out above */
+.deck-card[data-pos="out"] { opacity: 0; transform: translate(-30%, 4%) rotate(-4deg); z-index: 4; }
+
+.deck-head { display: flex; align-items: center; gap: 22px; }
+.deck-head h3 { margin: 0; font-weight: 400; font-size: clamp(1.4rem, 2.6vw, 2.1rem); letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; }
+.deck-head::after { content: ""; flex: 1; height: 1px; background: rgba(255, 255, 255, 0.5); }
+.deck-sub { display: flex; align-items: center; gap: 16px; margin: 16px 0 20px; color: var(--muted); font-size: 0.95rem; }
+.circle {
+  flex: none; width: 46px; height: 46px; border-radius: 50%;
+  display: grid; place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  transition: background 0.25s, color 0.25s;
+}
+.circle:hover { background: var(--teal); color: #000; border-color: var(--teal); }
+
+/* Picture area inside a card */
+.deck-media { flex: 1; min-height: 0; display: grid; gap: 6px; border-radius: 10px; overflow: hidden; }
+.deck-media img, .deck-media a { width: 100%; height: 100%; object-fit: cover; object-position: top; min-height: 0; }
+.deck-media.g3x2 { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+.deck-media.g2x2 { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); }
+.deck-media.g3 { grid-template-columns: repeat(3, 1fr); }
+.deck-media.g4 { grid-template-columns: repeat(4, 1fr); }
+/* paper: one document page sitting on the dark card, shown whole */
+.deck-media.paper { display: flex; align-items: center; justify-content: center; background: #000; }
+.deck-media.paper a { width: min(78%, 620px); height: auto; padding: 4% 3%; background: #fff; border-radius: 4px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+.deck-media.paper img { height: auto; object-fit: contain; }
+.deck-media a { position: relative; display: block; overflow: hidden; }
+/* Thumbnails, carousel slides and audit pages are shown whole (never cropped);
+   any spare space around them stays black */
+.deck-media.video img, .deck-media.g3 img, .deck-media.g4 img { object-fit: contain; object-position: center; background: #000; }
+.deck-media.video, .deck-media.g3, .deck-media.g4 { background: #000; align-items: center; }
+
+/* Hover a video thumbnail: a muted preview plays (script.js adds the iframe) */
+.deck-media iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%; border: 0;
+  pointer-events: none; transform: scale(1.35); opacity: 0; transition: opacity 0.4s;
+}
+.deck-media iframe.ready { opacity: 1; }
+
+/* The short film: click the poster to play */
+.film { position: relative; padding: 0; border: 0; cursor: pointer; background: none; }
+.film img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.film iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.film .play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--teal); color: #000; font-size: 18px;
+}
+
+/* Dots and arrows under the deck */
+.deck-nav { position: absolute; left: 0; bottom: 0; width: min(100%, 680px); display: flex; align-items: center; justify-content: space-between; }
+.dots { display: flex; gap: 12px; }
+.dots button { width: 11px; height: 11px; padding: 0; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.75); background: none; cursor: pointer; }
+.dots button.on { background: var(--teal); border-color: var(--teal); }
+.deck-nav .count { opacity: 0.7; }
+.arrows { display: flex; gap: 10px; }
+.arrows button { background: none; cursor: pointer; }
+
+/* ---------- 8. Ticker ---------- */
+.ticker {
+  overflow: hidden; padding: 26px 0;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+.ticker-track { display: flex; width: max-content; animation: slide 45s linear infinite; }
+.ticker span { font-size: clamp(1.6rem, 3.6vw, 2.8rem); font-weight: 400; letter-spacing: -0.03em; padding: 0 0.55em; white-space: nowrap; }
+.ticker span:nth-child(even) { font-family: var(--serif); font-style: italic; letter-spacing: 0; color: var(--amber); }
+@keyframes slide { to { transform: translateX(-50%); } }
+
+/* ---------- 9. Background (experience / education) ---------- */
+.background { padding: clamp(90px, 12vw, 150px) var(--gutter) 40px; }
+.background h2 { font-weight: 400; font-size: clamp(2.6rem, 7vw, 6rem); letter-spacing: -0.045em; line-height: 0.95; margin: 0 0 56px; }
+.cols { display: grid; gap: 48px; grid-template-columns: 1fr; }
+@media (min-width: 900px) { .cols { grid-template-columns: repeat(3, 1fr); } }
+.cols ol { list-style: none; margin: 18px 0 0; padding: 0; border-top: 1px solid var(--line); }
+.cols li { padding: 18px 0; border-bottom: 1px solid var(--line); }
+.cols b { display: block; font-weight: 500; font-size: 1.15rem; letter-spacing: -0.01em; }
+.cols li span { display: block; color: var(--muted); font-size: 0.95rem; margin-top: 4px; }
+.cols .caps.when { color: var(--muted); margin-bottom: 6px; }
+.aside { margin-top: 56px; color: var(--muted); font-size: 1.05rem; }
+
+/* ---------- 10. Contact ---------- */
+.contact { padding: clamp(100px, 14vw, 180px) var(--gutter) 70px; text-align: center; }
+.contact h2 { font-weight: 400; font-size: clamp(3.4rem, 13vw, 11rem); letter-spacing: -0.05em; line-height: 0.95; margin: 0 0 40px; }
+.contact .accent { font-size: 1.02em; }
+.buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 16px 28px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.6);
+  font-weight: 500; transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+.btn:hover { background: var(--text); color: #000; }
+.btn.primary { background: var(--amber); border-color: var(--amber); color: #000; }
+.btn.primary:hover { background: #fff; border-color: #fff; }
+
+footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 26px var(--gutter) 34px; border-top: 1px solid var(--line); opacity: 0.7; }
+
+/* ---------- 11. Entrance animations ---------- */
+/* Headline letters rise out of view, one after another (delays set in script.js) */
+.hero-title .word { display: inline-block; overflow: hidden; vertical-align: bottom; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.hero-title .ch { display: inline-block; transform: translateY(110%); animation: rise 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+@keyframes rise { to { transform: translateY(0); } }
+.hero-title .acc, .hero-meta, .scroll-mark, .nav { opacity: 0; animation: fade-in 1s ease 1s forwards; }
+.lens { opacity: 0; animation: fade-in 1s ease 1.4s forwards; }
+@keyframes fade-in { to { opacity: 1; } }
+.lens .ch { animation: none; transform: none; }
+.lens .acc { animation: none; opacity: 1; }
+
+/* Lines and blocks slide up as they scroll into view (script.js adds .in) */
+.reveal { opacity: 0; transform: translateY(40px); filter: blur(6px); transition: opacity 1s ease, transform 1s cubic-bezier(0.2, 0.75, 0.15, 1), filter 1s ease; }
+.reveal.in { opacity: 1; transform: none; filter: none; }
+.statement .reveal:nth-child(2) { transition-delay: 0.08s; }
+.statement .reveal:nth-child(3) { transition-delay: 0.16s; }
+.statement .reveal:nth-child(4) { transition-delay: 0.24s; }
+
+/* Phones: no hover lens trail, smaller deck */
+@media (max-width: 640px) {
+  .deck { height: 440px; }
+  .deck { margin-top: 60px; }
+  .deck-card[data-pos="1"] { transform: translate(4%, -11%) scale(0.95); }
+  .deck-card[data-pos="2"] { transform: translate(8%, -21%) scale(0.9); }
+  .hero-meta { flex-direction: column; gap: 18px; bottom: 30px; }
+}
+
+/* Visitors who switch on "reduce motion" get a calm, still page */
+@media (prefers-reduced-motion: reduce) {
+  .bg div, .ticker-track, .live { animation: none; }
+  .hero-title .ch, .hero-title .acc, .hero-meta, .scroll-mark, .nav, .lens { animation: none; transform: none; opacity: 1; }
+  .reveal { opacity: 1; transform: none; filter: none; transition: none; }
+  html { scroll-behavior: auto; }
+}
